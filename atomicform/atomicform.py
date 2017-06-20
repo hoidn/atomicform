@@ -61,7 +61,7 @@ def cleanStr(chars, s):
 #rawStr = cleanStr(deleteChars, open(tableFile, 'r').read())
 
 
-table = pd.read_csv('atomicform/data/all_atomic_ff_coeffs.txt', delimiter = '\t', header=None)
+table = pd.read_csv(utils.resource_path(tableFile, pkg_name = PKG_NAME), delimiter = '\t', header=None)
 table[0] = table[0].str.strip()
 table.index = table[0]
 table = table.drop(0, 1)
@@ -79,7 +79,7 @@ def getFofQ(k):
     """
 
     try:
-        _, a1, b1, a2, b2, a3, b3, a4, b4, c = table.loc[k]
+        a1, b1, a2, b2, a3, b3, a4, b4, c = np.array(table.loc[k], dtype = 'float')
     except KeyError:
         raise ValueError("invalid key: %s" % k)
         
