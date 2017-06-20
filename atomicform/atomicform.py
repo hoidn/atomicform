@@ -1,3 +1,7 @@
+from __future__ import with_statement
+from __future__ import division
+from __future__ import absolute_import
+
 import numpy as np
 import csv
 import operator
@@ -34,9 +38,6 @@ compute the approximate atomic form factors of various atoms and ions
 using tabulated values of the fit coefficients
 """
 #file with the tabulated coefficients
-from __future__ import with_statement
-from __future__ import division
-from __future__ import absolute_import
 tableFile = u'data/all_atomic_ff_coeffs.txt'
 
 #junk characters in the data file to get rid of
