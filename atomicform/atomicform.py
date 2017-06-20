@@ -6,6 +6,7 @@ from io import StringIO
 import re
 import pkgutil
 from utils import utils
+import pandas as pd
 
 PKG_NAME = __name__.split('.')[0]
 
@@ -59,25 +60,29 @@ def cleanStr(chars, s):
 #rawStr = cleanStr(deleteChars, pkgutil.get_data('atomicform', tableFile))
 #rawStr = cleanStr(deleteChars, open(tableFile, 'r').read())
 
-rawTable = np.genfromtxt(utils.resource_path(tableFile, pkg_name = PKG_NAME), dtype=('S20', float, float, float, float, float, float, float, float, float), delimiter='\t')
+
+table = pd.read_csv('atomicform/data/all_atomic_ff_coeffs.txt', delimiter = '\t', header=None)
+table[0] = table[0].str.strip()
+table.index = table[0]
+table = table.drop(0, 1)
+
+#rawTable = np.genfromtxt(utils.resource_path(tableFile, pkg_name = PKG_NAME), dtype=('S20', float, float, float, float, float, float, float, float, float), delimiter='\t')
 #rawTable = np.genfromtxt(utils.resource_path(tableFile), dtype=('S20', float, float, float, float, float, float, float, float, float), delimiter='\t')
 
 #elementKeys = rawTable[rawTable.dtype.names[0]]
 #numerical values of the table
-zipped = np.array(list(zip(*rawTable)))
-elementKeys, values = zipped[0], list(zip(*zipped[1:]))
-values = np.array(values, dtype=float)
-
-coeffDict = {k: v for (k, v) in zip(elementKeys, values)}
 
 def getFofQ(k): 
     """
     return function that evaluates atomic form factor corresponding to the
     element/ion key, based on tabulated approximations.
     """
-    if k not in coeffDict:
-        raise ValueError("valid keys are: " + str(list(coeffDict.keys())))
-    a1, b1, a2, b2, a3, b3, a4, b4, c = coeffDict[k]
+
+    try:
+        _, a1, b1, a2, b2, a3, b3, a4, b4, c = table.loc[k]
+    except KeyError:
+        raise ValueError("invalid key: %s" % k)
+        
     def FofQ(q):
         singleQ = lambda x :  a1 * np.exp(-b1 * (x/(4 * np.pi))**2)  +\
              a2 * np.exp(-b2 * (x/(4 * np.pi))**2)  + \
