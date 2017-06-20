@@ -66,7 +66,7 @@ def cleanStr(chars, s):
 #rawStr = cleanStr(deleteChars, pkgutil.get_data('atomicform', tableFile))
 #rawStr = cleanStr(deleteChars, open(tableFile, 'r').read())
 
-rawTable = np.genfromtxt(utils.resource_path(tableFile, pkg_name = PKG_NAME), dtype=(u'S20', float, float, float, float, float, float, float, float, float), delimiter=u'\t')
+rawTable = np.genfromtxt(utils.resource_path(tableFile, pkg_name = PKG_NAME), dtype=('S20', float, float, float, float, float, float, float, float, float), delimiter='\t')
 #rawTable = np.genfromtxt(utils.resource_path(tableFile), dtype=('S20', float, float, float, float, float, float, float, float, float), delimiter='\t')
 
 #elementKeys = rawTable[rawTable.dtype.names[0]]
