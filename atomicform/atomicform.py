@@ -13,6 +13,7 @@ from utils import utils
 from io import open
 from itertools import imap
 from itertools import izip
+import pandas as pd
 
 PKG_NAME = __name__.split(u'.')[0]
 
@@ -66,25 +67,34 @@ def cleanStr(chars, s):
 #rawStr = cleanStr(deleteChars, pkgutil.get_data('atomicform', tableFile))
 #rawStr = cleanStr(deleteChars, open(tableFile, 'r').read())
 
-rawTable = np.genfromtxt(utils.resource_path(tableFile, pkg_name = PKG_NAME), dtype=('S20', float, float, float, float, float, float, float, float, float), delimiter='\t')
+
+table = pd.read_csv('atomicform/data/all_atomic_ff_coeffs.txt', delimiter = '\t', header=None)
+table[0] = table[0].str.strip()
+table.index = table[0]
+table = table.drop(0, 1)
+
+#rawTable = np.genfromtxt(utils.resource_path(tableFile, pkg_name = PKG_NAME), dtype=('S20', float, float, float, float, float, float, float, float, float), delimiter='\t')
 #rawTable = np.genfromtxt(utils.resource_path(tableFile), dtype=('S20', float, float, float, float, float, float, float, float, float), delimiter='\t')
 
 #elementKeys = rawTable[rawTable.dtype.names[0]]
 #numerical values of the table
-zipped = np.array(list(izip(*rawTable)))
-elementKeys, values = zipped[0], list(izip(*zipped[1:]))
-values = np.array(values, dtype=float)
+#zipped = np.array(list(izip(*rawTable)))
+#elementKeys, values = zipped[0], list(izip(*zipped[1:]))
+#values = np.array(values, dtype=float)
 
-coeffDict = dict((k, v) for (k, v) in izip(elementKeys, values))
+#coeffDict = dict((k, v) for (k, v) in izip(elementKeys, values))
 
 def getFofQ(k): 
     u"""
     return function that evaluates atomic form factor corresponding to the
     element/ion key, based on tabulated approximations.
     """
-    if k not in coeffDict:
-        raise ValueError(u"valid keys are: " + unicode(list(coeffDict.keys())))
-    a1, b1, a2, b2, a3, b3, a4, b4, c = coeffDict[k]
+
+    try:
+        _, a1, b1, a2, b2, a3, b3, a4, b4, c = table.loc[k]
+    except KeyError:
+        raise ValueError("invalid key: %s" % k)
+        
     def FofQ(q):
         singleQ = lambda x :  a1 * np.exp(-b1 * (x/(4 * np.pi))**2)  +\
              a2 * np.exp(-b2 * (x/(4 * np.pi))**2)  + \
